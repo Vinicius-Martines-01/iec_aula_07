@@ -1,0 +1,70 @@
+name: CI/CD Aula 05 - Sistema Composite
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Iniciar Python para Auditoria
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Dependency Audit (pip-audit)
+        run: |
+          pip install pip-audit
+          pip-audit --ignore-vuln CVE-2026-4539
+
+  build:
+    runs-on: ubuntu-latest
+    needs: security
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login no Docker hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build e push de imagem
+        uses: docker/build-push-action@v5 
+        with:
+          context: . 
+          push: true
+          tags: viniciusfatec/pipeline-ci:latest
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login no Docker hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Rodar Teste do Container
+        run: docker run viniciusfatec/pipeline-ci:latest 
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Server
+        run: echo "Deploy do Sistema de Pedidos finalizado com sucesso!"
