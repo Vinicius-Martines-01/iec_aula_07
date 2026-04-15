@@ -27,6 +27,7 @@
           run: |
             pip install pip-audit
             pip-audit --ignore-vuln CVE-2026-4539
+            pip-audit --ignore-vuln CVE-2026-4539
 
     build:
       runs-on: ubuntu-latest
