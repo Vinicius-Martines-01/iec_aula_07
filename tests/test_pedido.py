@@ -1,5 +1,5 @@
 import pytest
-from app import Produto, ConjuntoDeItens, Cliente, Pedido 
+from main import Produto, ConjuntoDeItens, Cliente, Pedido 
 
 def test_calculo_total_composite():
     """Testa se o Composite soma corretamente produtos e custos extras"""
