@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 3000
 # 6. Comando para rodar a aplicação (exemplo para um script)
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
