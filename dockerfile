@@ -8,9 +8,6 @@ ENV PYTHONUNBUFFERED=1
 # 3. Defina o diretório de trabalho
 WORKDIR /app
 
-# 4. Instale as dependências (separado para aproveitar o cache do Docker)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Copie o restante do código da aplicação
 COPY . .
